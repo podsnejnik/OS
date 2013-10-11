@@ -17,7 +17,7 @@
   );
   %command = ('00' => 1, '11' => 1, '15' => 1, '02' => 1, '21' => 1, '25' => 1, '31' => 1, 'FE' => 1, 'F0' => 1, 'F1' => 1, 'F4' => 1, 'F5' => 1, 'FF' => 1);
  
-if (@ARGV > 0){
+if (@ARGV > 0){ # çàíóëÿåì îï è ïåðåõ, åñëè ïðîâîäà ðàçîðâàíû
   for $i(0..@ARGV-1){
     $broken = $ARGV[$i];
     if ($broken eq 'op'){
@@ -33,8 +33,8 @@ if (@ARGV > 0){
   }    
 }
  
-@memory = ();
-
+@memory = (); # ïàìÿòü
+#----------------------------ïàðñèì âõîäíîé ôàéë â 2 ìàññèâà
 open F, '<', "k.txt" or die "Ñan't open file!";
 chomp(@proga = <F>);#v proga legat stroki nashego faila
 close F;
@@ -46,7 +46,7 @@ for $i(0..(@proga-1)) {
 	if ($command{$kop}){push (@clear_proga, [$kop, $addr]);}
 	else{push (@data, $kop);}
 }
-
+#--------------------------------èíèöèàëèçèðóåì ïàìÿòü
 for $i(0..(@clear_proga-1)){
 	$clear_proga[$i][0] = hex($clear_proga[$i][0]);
 	push (@memory, $clear_proga[$i][0]);
@@ -68,28 +68,28 @@ $length = @memory;
 for $i(0..((2**16)-1-$length)){ 
 	push (@memory, 0);
 }
-
+#---------------------------------èíèöèàëèçèðóåì ðåãèñòðû
 %REG_RON = ('pr'=> 0, 'zn' => 0);
 $REG_IR = 0;
 $REG_UKKOM = 0;
-
+#--------------------------------èíèöèàëèçèðóåì ôëàãè
 $pusk = 1;
 our $flag_F = 0;
-($zapp, $zam1, $zam2, $vzap1, $vib, $chist, $adrkom, $kom, $p_kop, $ind, $p_a, $p_ia, $p_sum, $p_rez1, $p_pr) = (0,0,0,0,0,0,1,1,1,1,1,1,1,1,1);
+($zapp, $zam1, $zam2, $vzap1, $vib, $chist, $adrkom, $kom, $p_kop, $ind, $p_a, $p_ia, $p_sum, $p_rez1, $p_pr) = (0,0,0,0,0,0,1,1,1,1,1,1,1,1,1); # ïðîñòî ïîêà îáíóëèëè
 setConstants();
 while($pusk){	
-	if($adrkom) {$my_reg_ukkom = $REG_UKKOM;} else  {$my_reg_ukkom = 0;}
-	if($adrkom) {$my_reg_ukkom_in_memory = $my_reg_ukkom * 3;} else {$my_reg_ukkom_in_memory = 0;}
+	if($adrkom) {$my_reg_ukkom = $REG_UKKOM;} else  {$my_reg_ukkom = 0;}# óêàçàòåëü íà òåêóùóþ êîìàíäó
+	if($adrkom) {$my_reg_ukkom_in_memory = $my_reg_ukkom * 3;} else {$my_reg_ukkom_in_memory = 0;}# óêàçàòåëü êàêîå ÷èñëî áðàòü â ïàìÿòè
 	if($kom) {$my_kop = @memory[$my_reg_ukkom_in_memory];} else {$my_kop = 0;}	
 	# print "my_kop = ", $my_kop, "\n";
 	if($kom) {$my_fbyte = @memory[$my_reg_ukkom_in_memory + 1];} else{$my_fbyte = 0;}
 	if($kom) {$my_sbyte = @memory[$my_reg_ukkom_in_memory + 2];} else {$my_sbyte = 0;}
-	if($kom) {$my_addr = $my_fbyte * 256 + $my_sbyte;} else{$my_addr = 0;}
+	if($kom) {$my_addr = $my_fbyte * 256 + $my_sbyte;} else{$my_addr = 0;} # àäðåñ îòêóäà áðàòü äàííûå â ïàìÿòè
 	our $pereh = -2;
-	if ($p_kop) {dekkom($my_kop);}
-	setConstants();
-	if($ind) {$my_ir = $REG_IR;} else{$my_ir = 0;}
-	if($p_a) {$my_addr2 = $my_addr;} else{$my_addr2 = 0;}
+	if ($p_kop) {dekkom($my_kop);} #óñòàíîâëèâàåì ôëàãè	
+	setConstants(); # èíèöèàëèçèðóåì îòïàâøèå ïðîâîäà
+	if($ind) {$my_ir = $REG_IR;} else{$my_ir = 0;} #ðåãèñòð IR
+	if($p_a) {$my_addr2 = $my_addr;} else{$my_addr2 = 0;} # àäðåñ îòêóäà áðàòü äàííûå â ïàìÿòè + ïðîâåðêà íà ïðîâîäà
 	if($p_ia){$my_i_addr = $my_ir + $my_addr2;} else{$my_i_addr = 0;}
 	$t0 = multipl(($memory[$my_i_addr] * 256 + $memory[$my_i_addr + 1]), $my_i_addr, $vib);
 	if($p_sum){$t1 = $REG_RON{'zn'};} else{$t1 = 0;} 
@@ -120,7 +120,7 @@ while($pusk){
 	else {$new_pereh = $table_com{$my_kop}[3];}
 	$REG_UKKOM = multipl(($my_reg_ukkom + 1), $my_i_addr, $new_pereh) if ($pusk == 1);
 }
-
+#----------------------ïå÷àòü
 $, = "  ";
 print "REG_IR = ", (sprintf "%x", $REG_IR), "\n";
 print "REG_UKKOM = ", (sprintf "%x", $REG_UKKOM), "\n";
@@ -134,15 +134,15 @@ for (@memory){
 	print "\n" if($count % 16 == 0 && $count != 0);
 	last if($count == 160);
 }
-
-sub alu_pr{
+#--------------------------
+sub alu_pr{ # âîçâðàùàåò ïðèçíàê äëÿ ïåðåõîäà
 	$res = shift;
 	return '01' if($res == 0);
 	return '10' if($res > 0);
 	return '11' if($res < 0);
 }
 
-sub alu{
+sub alu{ # $t0 - ïàìÿòü, $t1 - ÐÎÍ
 	($arg0, $arg1, $kop) = (shift, shift, shift);
 	$op = ${$table_com{$kop}}[2];
 	return my_module($arg1) if (!$op); 
@@ -151,14 +151,14 @@ sub alu{
 	return my_module($arg1 - $arg0) if ($op == 3);
 }
 
-sub my_module{
+sub my_module{ # ïðèâåëè ÷èñëî ê âèäó [-32768, 32767]
 	$number = shift;
 	$norm = $number % 2**16;
 	$norm = $norm - 2 ** 16 if ($norm >= 2 ** 15);
 	return $norm;
 }
 
-sub multipl{
+sub multipl{ # ìóëüòèïëåêñîð
 	@args = @_;
 	return $args[$args[@args-1]];
 }
@@ -178,13 +178,13 @@ sub dekkom(){
 	if ($com1 == 240) {	
 		# $pereh = 1 - (int( $priznak / 16 ));
 		$pereh = int( $priznak / 16 );
-	}
-	if ($com1 == 241) {	$pereh = $priznak % 16;}
+	} # ïîäåëèëè íàöåëî íà 16 !!!
+	if ($com1 == 241) {	$pereh = $priznak % 16;} # âçÿëè îñòàòîê îò äåëåíèÿ íà 16
 	if ($com1 == 244) {	$pereh = 1 - $flag_F;}
 	if ($com1 == 245) {	$pereh = $flag_F;}
 }
 
-
+#-----------------------------------èíèöèàëèçèðóåì îòïàâøèå ïðîâîäà
 sub setConstants(){ 
   %num_hash = ('zapp' => 0, 'zam1' => 1, 'vzap1' => 2,
     'zam2'=> 3, 'chist' => 4, 'pusk' => 5, 'vib' => 6, 'adrkom' => 7, 'kom' => 8, 'p_kop' => 9, 'ind' => 10, 'p_a' => 11, 'p_ia' => 12, 'p_sum' =>13, 'p_rez1'=>14, 'p_pr' => 15);
